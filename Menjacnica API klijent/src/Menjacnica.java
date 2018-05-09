@@ -1,5 +1,6 @@
 import java.awt.BorderLayout;
 import java.awt.EventQueue;
+import java.util.GregorianCalendar;
 import java.util.LinkedList;
 import java.util.Map;
 
@@ -14,6 +15,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
 import klaseJSON.Drzava;
+import klaseJSON.Transakcije;
 
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -21,6 +23,10 @@ import javax.swing.JComboBox;
 import javax.swing.JTextField;
 import javax.swing.JButton;
 import java.awt.event.ActionListener;
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.PrintWriter;
+import java.text.SimpleDateFormat;
 import java.awt.event.ActionEvent;
 
 public class Menjacnica extends JFrame {
@@ -114,27 +120,44 @@ public class Menjacnica extends JFrame {
 		btnKonvertuj.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				Drzava dr = (Drzava) comboBox.getSelectedItem();
-				String str = dr.getCurrencyId() + "_";
+				String iz = dr.getCurrencyId();
 				dr = (Drzava) comboBox_1.getSelectedItem();
-				str += dr.getCurrencyId();
-				String novi = str;
-				str = "http://free.currencyconverterapi.com/api/v3/convert?q=" + str;
+				String u = dr.getCurrencyId();
+				String s = iz + "_" + u;
+				String str = "http://free.currencyconverterapi.com/api/v3/convert?q=" + s;
 				try {
 					str = URLConnectionUtil.getContent(str);
 					JsonParser p = new JsonParser();
 					JsonObject object = p.parse(str).getAsJsonObject();
-					Gson g = new GsonBuilder().create();
+					Gson g = new GsonBuilder().setPrettyPrinting().create();
 					int count = g.fromJson(object.getAsJsonObject("query").getAsJsonPrimitive("count"), int.class);
 					if (count == 0) {
 						JOptionPane.showMessageDialog(null, "Nemoguce je izvrsiti transakciju!", "Greska",
 								JOptionPane.ERROR_MESSAGE);
 						return;
 					}
-					double kurs = g.fromJson(
-							object.getAsJsonObject("results").getAsJsonObject(novi).getAsJsonPrimitive("val"),
+					Double kurs = g.fromJson(
+							object.getAsJsonObject("results").getAsJsonObject(s).getAsJsonPrimitive("val"),
 							double.class);
 					Double d = new Double(kurs * Double.parseDouble(textField.getText()));
 					textField_1.setText(d.toString());
+
+					Transakcije t = new Transakcije();
+					t.setDatumVreme(new GregorianCalendar());
+					t.setIzValute(iz);
+					t.setuValutu(u);
+
+					if (count == 0)
+						t.setKurs(null);
+					else
+						t.setKurs(kurs.toString());
+					try (FileWriter writer = new FileWriter("data/log.json");) {
+						writer.write(g.toJson(t));
+						writer.close();
+					} catch (Exception e) {
+						System.out.println("Greska: " + e.getMessage());
+					}
+
 				} catch (Exception e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
