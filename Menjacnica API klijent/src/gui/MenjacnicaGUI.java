@@ -102,7 +102,6 @@ public class MenjacnicaGUI extends JFrame {
 				String u = dr.getCurrencyId();
 				String iznos = textField.getText();
 				textField_1.setText(kontroler.getM().konvertuj(iz, u, iznos));
-				kontroler.getM().sacuvaj(iz, u);
 			}
 		});
 		btnKonvertuj.setBounds(163, 220, 107, 23);

@@ -1,13 +1,14 @@
-{
-  "datumVreme": {
-    "year": 2018,
-    "month": 4,
-    "dayOfMonth": 17,
-    "hourOfDay": 1,
-    "minute": 30,
-    "second": 14
+[
+  {
+    "datumVreme": "2018-05-17 01-57-24.000752",
+    "izValute": "KHR",
+    "uValutu": "VEF",
+    "kurs": "17.215236"
   },
-  "izValute": "BRL",
-  "uValutu": "AFN",
-  "kurs": "19.247992"
-}
+  {
+    "datumVreme": "2018-05-17 01-58-29.000622",
+    "izValute": "SOS",
+    "uValutu": "QAR",
+    "kurs": "0.006465"
+  }
+]

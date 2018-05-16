@@ -5,16 +5,16 @@ import java.util.GregorianCalendar;
 
 public class Transakcije {
 
-	private GregorianCalendar datumVreme;
+	private String datumVreme;
 	private String izValute;
 	private String uValutu;
 	private String kurs;
 
-	public GregorianCalendar getDatumVreme() {
+	public String getDatumVreme() {
 		return datumVreme;
 	}
 
-	public void setDatumVreme(GregorianCalendar datumVreme) {
+	public void setDatumVreme(String datumVreme) {
 		this.datumVreme = datumVreme;
 	}
 

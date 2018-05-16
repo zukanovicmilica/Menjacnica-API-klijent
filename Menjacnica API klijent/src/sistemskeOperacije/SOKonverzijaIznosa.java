@@ -16,7 +16,7 @@ import domen.Transakcije;
 
 public class SOKonverzijaIznosa {
 
-	public static String izvrsi(String iz, String u, String iznos) {
+	public static Double izvrsi(String iz, String u) {
 		final String serviceConvert = "/convert";
 		final String CURRENCY_LAYER_API_URL = "http://free.currencyconverterapi.com/api/v5";
 		String url = CURRENCY_LAYER_API_URL + serviceConvert + '?' + "q=" + iz + '_' + u;
@@ -30,16 +30,15 @@ public class SOKonverzijaIznosa {
 			if (count == 0) {
 				JOptionPane.showMessageDialog(null, "Nemoguce je izvrsiti transakciju!", "Greska",
 						JOptionPane.ERROR_MESSAGE);
-				return null;
+				return (double) 0;
 			}
 			Double kurs = g.fromJson(object.getAsJsonObject("results").getAsJsonObject(iz+"_"+u).getAsJsonPrimitive("val"),
 					double.class);
-			Double d = new Double(kurs * Double.parseDouble(iznos));
-			return d.toString();
+			return kurs;
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		return null;
+		return (double) 0;
 	}
 }
