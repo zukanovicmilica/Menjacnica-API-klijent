@@ -1,3 +1,5 @@
+package gui;
+
 import java.awt.BorderLayout;
 import java.awt.EventQueue;
 import java.util.GregorianCalendar;
@@ -14,8 +16,12 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
-import klaseJSON.Drzava;
-import klaseJSON.Transakcije;
+import domen.Drzava;
+import domen.Transakcije;
+import sistemskeOperacije.SOKonverzijaIznosa;
+import sistemskeOperacije.SOPreuzimanjeDrzava;
+import sistemskeOperacije.SOSacuvajKonverziju;
+import sistemskeOperacije.URLConnectionUtil;
 
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -29,34 +35,17 @@ import java.io.PrintWriter;
 import java.text.SimpleDateFormat;
 import java.awt.event.ActionEvent;
 
-public class Menjacnica extends JFrame {
+public class MenjacnicaGUI extends JFrame {
 
 	private JPanel contentPane;
 	private JTextField textField;
 	private JTextField textField_1;
-	public LinkedList<Drzava> drzave = new LinkedList<>();
-
-	/**
-	 * Launch the application.
-	 */
-	public static void main(String[] args) {
-		EventQueue.invokeLater(new Runnable() {
-			public void run() {
-				try {
-					Menjacnica frame = new Menjacnica();
-					frame.setVisible(true);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-		});
-	}
 
 	/**
 	 * Create the frame.
 	 */
 
-	public Menjacnica() {
+	public MenjacnicaGUI(GUIKontroler kontroler) {
 		setResizable(false);
 		setTitle("Menjacnica");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -65,20 +54,8 @@ public class Menjacnica extends JFrame {
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(contentPane);
 		contentPane.setLayout(null);
-
-		try {
-			String url = URLConnectionUtil.getContent("http://free.currencyconverterapi.com/api/v3/countries");
-			JsonParser p = new JsonParser();
-			Gson g = new GsonBuilder().create();
-			JsonObject drzaveJSON = p.parse(url).getAsJsonObject().getAsJsonObject("results");
-			for (Map.Entry<String, JsonElement> entry : drzaveJSON.entrySet()) {
-				Drzava d = g.fromJson(entry.getValue(), Drzava.class);
-				drzave.add(d);
-			}
-
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+		
+		
 
 		JLabel lblIzValuteZemlje = new JLabel("Iz valute zemlje:");
 		lblIzValuteZemlje.setBounds(40, 40, 107, 24);
@@ -91,12 +68,12 @@ public class Menjacnica extends JFrame {
 		JComboBox comboBox = new JComboBox();
 		comboBox.setBounds(40, 75, 131, 20);
 		contentPane.add(comboBox);
-		dodajListu(comboBox);
+		kontroler.dodajListu(comboBox);
 
 		JComboBox comboBox_1 = new JComboBox();
 		comboBox_1.setBounds(263, 75, 131, 20);
 		contentPane.add(comboBox_1);
-		dodajListu(comboBox_1);
+		kontroler.dodajListu(comboBox_1);
 
 		JLabel lblIznos = new JLabel("Iznos:");
 		lblIznos.setBounds(40, 143, 46, 14);
@@ -123,55 +100,14 @@ public class Menjacnica extends JFrame {
 				String iz = dr.getCurrencyId();
 				dr = (Drzava) comboBox_1.getSelectedItem();
 				String u = dr.getCurrencyId();
-				String s = iz + "_" + u;
-				String str = "http://free.currencyconverterapi.com/api/v3/convert?q=" + s;
-				try {
-					str = URLConnectionUtil.getContent(str);
-					JsonParser p = new JsonParser();
-					JsonObject object = p.parse(str).getAsJsonObject();
-					Gson g = new GsonBuilder().setPrettyPrinting().create();
-					int count = g.fromJson(object.getAsJsonObject("query").getAsJsonPrimitive("count"), int.class);
-					if (count == 0) {
-						JOptionPane.showMessageDialog(null, "Nemoguce je izvrsiti transakciju!", "Greska",
-								JOptionPane.ERROR_MESSAGE);
-						return;
-					}
-					Double kurs = g.fromJson(
-							object.getAsJsonObject("results").getAsJsonObject(s).getAsJsonPrimitive("val"),
-							double.class);
-					Double d = new Double(kurs * Double.parseDouble(textField.getText()));
-					textField_1.setText(d.toString());
-
-					Transakcije t = new Transakcije();
-					t.setDatumVreme(new GregorianCalendar());
-					t.setIzValute(iz);
-					t.setuValutu(u);
-
-					if (count == 0)
-						t.setKurs(null);
-					else
-						t.setKurs(kurs.toString());
-					try (FileWriter writer = new FileWriter("data/log.json");) {
-						writer.write(g.toJson(t));
-						writer.close();
-					} catch (Exception e) {
-						System.out.println("Greska: " + e.getMessage());
-					}
-
-				} catch (Exception e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
+				String iznos = textField.getText();
+				textField_1.setText(kontroler.getM().konvertuj(iz, u, iznos));
+				kontroler.getM().sacuvaj(iz, u);
 			}
 		});
 		btnKonvertuj.setBounds(163, 220, 107, 23);
 		contentPane.add(btnKonvertuj);
 
-	}
-
-	private void dodajListu(JComboBox ponudjeno) {
-		for (Drzava i : drzave)
-			ponudjeno.addItem(i);
 	}
 
 }

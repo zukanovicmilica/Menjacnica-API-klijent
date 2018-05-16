@@ -1,4 +1,4 @@
-package klaseJSON;
+package domen;
 
 import java.text.SimpleDateFormat;
 import java.util.GregorianCalendar;

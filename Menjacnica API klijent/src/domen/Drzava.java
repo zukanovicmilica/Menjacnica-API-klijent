@@ -1,4 +1,4 @@
-package klaseJSON;
+package domen;
 
 public class Drzava {
 
