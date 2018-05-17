@@ -54,8 +54,6 @@ public class MenjacnicaGUI extends JFrame {
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(contentPane);
 		contentPane.setLayout(null);
-		
-		
 
 		JLabel lblIzValuteZemlje = new JLabel("Iz valute zemlje:");
 		lblIzValuteZemlje.setBounds(40, 40, 107, 24);
@@ -93,6 +91,10 @@ public class MenjacnicaGUI extends JFrame {
 		contentPane.add(textField_1);
 		textField_1.setColumns(10);
 
+		JLabel lblPoruka = new JLabel("");
+		lblPoruka.setBounds(40, 120, 230, 14);
+		contentPane.add(lblPoruka);
+		
 		JButton btnKonvertuj = new JButton("Konvertuj");
 		btnKonvertuj.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
@@ -100,13 +102,19 @@ public class MenjacnicaGUI extends JFrame {
 				String iz = dr.getCurrencyId();
 				dr = (Drzava) comboBox_1.getSelectedItem();
 				String u = dr.getCurrencyId();
-				String iznos = textField.getText();
-				textField_1.setText(kontroler.getM().konvertuj(iz, u, iznos));
+				String iznos=textField.getText();
+				if(!kontroler.isNumeric(iznos)){
+					lblPoruka.setText("Morate da unesete brojcani izraz!");
+				}
+				else {
+					textField_1.setText(kontroler.getM().konvertuj(iz, u, iznos));
+				}
 			}
 		});
 		btnKonvertuj.setBounds(163, 220, 107, 23);
 		contentPane.add(btnKonvertuj);
+		
+		
 
 	}
-
 }
